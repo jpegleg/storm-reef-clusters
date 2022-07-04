@@ -1,0 +1,104 @@
+---
+- name: install snap to all nodes
+  hosts: reef
+  tasks:
+  
+  - name: install snap
+    apt:
+      name: snapd
+      state: latest
+      
+  - name: enable and start snapd
+    shell: systemctl enable snapd && systemctl start snapd
+    args:
+      executable: /bin/bash
+    
+  - name: install microk8s snap
+    shell:  yes | snap install microk8s --classic 
+    args:
+      executable: /bin/bash
+ 
+- name: use designated control-node to get token and use calicoctl
+  hosts: control-node
+  tasks:
+
+  - name: install calicoctl
+    shell: curl -L https://github.com/projectcalico/calico/releases/download/v3.23.2/calicoctl-linux-amd64 -o calicoctl && cp calicoctl /usr/local/sbin/calicoctl && chmod +x /usr/local/sbin/calicoctl
+    args:
+      executable: /bin/bash
+
+  - name: register control plane node add command as cadd
+    shell:  microk8s add-node | head -n2 | tail -n1
+    args:
+      executable: /bin/bash
+    register: cadd
+    tags: form
+ 
+  - name: register worker node add command as wadd
+    shell:  microk8s add-node | grep worker | tail -n1
+    args:
+      executable: /bin/bash
+    register: wadd
+    tags: form
+
+  - name: fill hostvar name
+    add_host:
+      name: "cnode"
+      CADD: "{{ cadd.stdout }}"
+      WADD: "{{ wadd.stdout }}"
+    tags: form
+
+- name: add additional control plane nodes
+  hosts: added-control-plane
+  tasks:
+
+  - name: install calicoctl
+    shell: curl -L https://github.com/projectcalico/calico/releases/download/v3.23.2/calicoctl-linux-amd64 -o calicoctl && cp calicoctl /usr/local/sbin/calicoctl && chmod +x /usr/local/sbin/calicoctl
+    args:
+      executable: /bin/bash
+
+  - name: add additional control plane nodes to the cluster
+    shell: "{{ hostvars['cnode']['CADD'] }}"
+    args:
+      executable: /bin/bash
+    tags: form
+
+- name: add worker nodes
+  hosts: workers
+  tasks:
+
+  - name: add worker nodes to the cluster
+    shell: "{{ hostvars['cnode']['WADD'] }}"
+    args:
+      executable: /bin/bash
+    tags: form
+
+- name: apply kubernetes manifests 
+  hosts: control-node
+  tasks:
+
+  - name: copy out storm-network.yml to control-node
+    copy:
+      src: files/storm-network.yml
+      dest: /root/storm-network.yml
+    tags: 
+      - form
+      - net
+
+  - name: copy out calicoctl patch script to control-node
+    copy:
+      src: files/apply-network
+      dest: /root/apply-network
+    tags: 
+      - form
+      - net
+
+  - name: apply apply-network script
+    shell: bash /root/apply-network
+    args:
+      executable: /bin/bash
+    tags: 
+      - form
+      - net
+
+...
