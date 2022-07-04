@@ -1,0 +1,2 @@
+calicoctl patch kubecontrollersconfiguration default --patch='{"spec": {"controllers": {"node": {"hostEndpoint": {"autoCreate": "Enabled"}}}}}'
+calicoctl apply -f /root/storm-network.yml
