@@ -3,7 +3,6 @@ Ansible template for (microk8s) kubernetes cluster configuration.
 This is designed for Ubuntu(22) but should work on other debian-based distros.
 Adjust the "apt" related refernces and confirm the rsyslog.conf settings to customize for another distro.
 
-- permissive global network policy template
 - calico eBPF dataplane with wireguard and DSR
 - deploy rsyslog.conf
 - add wazuh repo and register wazuh agent
@@ -104,9 +103,14 @@ Instead of manual/other adding to the control plane or worker pool, the anisble 
 ansible-playbook -u root -i hosts.ini build-reef.yml --tags form
 ```
 
-#### Notes about policy and node joining order
+#### Notes about rejoining and rebuilding
 
-The global network policy should be applied before a node is joined to ensure the node follows the policy immediately.
+Once a node is joined, attempts to join it again will error. There are a few ays to handle this.
+We can create additional inventory files that only contain new nodes when doing a cluster expansion.
+We can ignore errors on node join in the ansible.
+Or we can can rebuild the cluster completely.
+
+Rebuilding the cluster is fairly quick. We can use `microk8s leave` on each node to dissolve the cluster entirely, or `microk8s remove-node $node` to remove a specific node from the cluster.
 
 #### Calicoctl version
 
