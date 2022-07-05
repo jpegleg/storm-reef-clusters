@@ -1,5 +1,4 @@
 mkdir ~/.kube/
 microk8s kubectl config view --raw > ~/.kube/config
 chmod 600 ~/.kube/config
-calicoctl patch kubecontrollersconfiguration default --patch='{"spec": {"controllers": {"node": {"hostEndpoint": {"autoCreate": "Enabled"}}}}}' --allow-version-mismatch
 calicoctl apply -f /root/storm-network.yml --allow-version-mismatch
