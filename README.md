@@ -104,6 +104,9 @@ Instead of manual/other adding to the control plane or worker pool, the anisble 
 ansible-playbook -u root -i hosts.ini build-reef.yml --tags form
 ```
 
+#### Notes about policy and node joining order
+
+The global network policy should be applied before a node is joined to ensure the node follows the policy immediately.
 
 #### Calicoctl version
 
