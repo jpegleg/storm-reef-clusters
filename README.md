@@ -79,3 +79,27 @@ To only install misc packages:
 ```
 ansible-playbook -u root -i hosts.inventory build-reef.yml --tags packages
 ```
+
+
+#### Later adding a node to the control plane or worker pool:
+
+To manually do it, just the usual easy microk8s add-node:
+
+```
+root@reef6:~# microk8s add-node
+From the node you wish to join to this cluster, run the following:
+microk8s join 192.168.1.140:25000/eea74306aa30df26807fe0d739ce240a/fef7f9a2d5be
+
+Use the '--worker' flag to join a node as a worker not running the control plane, eg:
+microk8s join 192.168.1.140:25000/eea74306aa30df26807fe0d739ce240a/fef7f9a2d5be --worker
+
+If the node you are adding is not reachable through the default interface you can use one of the following:
+microk8s join 192.168.1.140:25000/eea74306aa30df26807fe0d739ce240a/fef7f9a2d5be
+microk8s join 10.1.103.194:25000/eea74306aa30df26807fe0d739ce240a/fef7f9a2d5be
+```
+
+Instead of manual/other adding to the control plane or worker pool, the anisble tag "form" in the build-reef.yml will also join/re-join nodes from inventory:
+
+```
+ansible-playbook -u root -i hosts.ini build-reef.yml --tags form
+```
