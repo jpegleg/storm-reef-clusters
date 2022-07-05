@@ -73,7 +73,7 @@
     tags: wazuh
 
   - name: register wazuh agent
-    shell: WAZUH_MANAGER="192.168.1.126" apt-get install wazuh-agent
+    shell: WAZUH_MANAGER="SETMETOTHELOGGINGHOST" apt-get install wazuh-agent
     args:
       executable: /bin/bash
     tags: wazuh
