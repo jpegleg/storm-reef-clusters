@@ -8,7 +8,7 @@ Adjust the "apt" related refernces and confirm the rsyslog.conf settings to cust
 - deploy rsyslog.conf
 - add wazuh repo and register wazuh agent
 
-#### nsure tha your wazuh manager/rsyslog  server IP is used in the rsyslog.conf and agent registration:
+#### Ensure tha your wazuh manager/rsyslog  server IP is used in the rsyslog.conf and agent registration:
 
 ```
 sed -i 's/SETMETOTHELOGGINGHOST/blah.blah.blah.yourlogginghost/g' files/rsyslog.conf
