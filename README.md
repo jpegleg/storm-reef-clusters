@@ -68,7 +68,7 @@ To only apply the rsyslog.conf:
 ansible-playbook -u root -i hosts.inventory build-reef.yml --tags rsyslog
 ```
 
-To only register the waazuh agent:
+To only register the wazuh agent:
 
 ```
 ansible-playbook -u root -i hosts.inventory build-reef.yml --tags wazuh
