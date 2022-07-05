@@ -106,11 +106,11 @@ ansible-playbook -u root -i hosts.ini build-reef.yml --tags form
 #### Notes about rejoining and rebuilding
 
 Once a node is joined, attempts to join it again will error. There are a few ays to handle this.
-We can create additional inventory files that only contain new nodes when doing a cluster expansion.
-We can ignore errors on node join in the ansible.
+We can create additional inventory files that only contain new nodes when doing a cluster expansion. amd the designated control plane node that provides the token.
+We can set ignore errors on node join in the ansible.
 Or we can can rebuild the cluster completely.
 
-Rebuilding the cluster is fairly quick. We can use `microk8s leave` on each node to dissolve the cluster entirely, or `microk8s remove-node $node` to remove a specific node from the cluster.
+Rebuilding the cluster is fairly quick. We can use `microk8s leave` on each node to dissolve the cluster entirely, or `microk8s remove-node $node` to remove a specific node from the cluster but there may be files or containers that do not get destroyed, that later cause conflict. We can avoid that by instead of doing a leave, completely remove the microk8s snap with `snap remove microk8s`, which will be better for rebuilding the cluster cleanly.
 
 #### Calicoctl version
 
