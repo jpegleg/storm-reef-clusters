@@ -1,5 +1,7 @@
 # storm-reef-clusters 🌀🪸
 Ansible template for (microk8s) kubernetes cluster configuration.
+This is designed for Ubuntu(22) but should work on other debian-based distros.
+Adjust the "apt" related refernces and confirm the rsyslog.conf settings to customize for another distro.
 
 - permissive global network policy template
 - calico eBPF dataplane with wireguard and DSR
@@ -50,3 +52,21 @@ To only apply the network manifest only:
 ansible-playbook -u root -i hosts.inventory build-reef.yml --tags net
 ```
 
+
+To only apply the rsyslog.conf:
+
+```
+ansible-playbook -u root -i hosts.inventory build-reef.yml --tags rsyslog
+```
+
+To only register the waazuh agent:
+
+```
+ansible-playbook -u root -i hosts.inventory build-reef.yml --tags wazuh
+```
+
+To only install misc packages:
+
+```
+ansible-playbook -u root -i hosts.inventory build-reef.yml --tags packages
+```
