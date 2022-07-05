@@ -1,4 +1,4 @@
-# storm-reef-clusters 🌀🪸
+# storm-reef-clusters 🌀🪸🌀
 Ansible template for (microk8s) kubernetes cluster configuration.
 This is designed for Ubuntu(22) but should work on other debian-based distros.
 Adjust the "apt" related refernces and confirm the rsyslog.conf settings to customize for another distro.
