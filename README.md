@@ -5,9 +5,18 @@ Adjust the "apt" related refernces and confirm the rsyslog.conf settings to cust
 
 - permissive global network policy template
 - calico eBPF dataplane with wireguard and DSR
+- deploy rsyslog.conf
+- add wazuh repo and register wazuh agent
+
+#### nsure tha your wazuh manager/rsyslog  server IP is used in the rsyslog.conf and agent registration:
+
+```
+sed -i 's/SETMETOTHELOGGINGHOST/blah.blah.blah.yourlogginghost/g' files/rsyslog.conf
+sed -i 's/SETMETOTHELOGGINGHOST/blah.blah.blah.yourlogginghost/g' build-reef.yml
+```
 
 
-Example inventory:
+#### Example inventory:
 
 ```
 [reef]
@@ -34,7 +43,7 @@ reef1
 
 ```
 
-Example usage:
+## Example usage:
 
 ```
 ansible-playbook -u root -i hosts.inventory build-reef.yml
