@@ -103,3 +103,8 @@ Instead of manual/other adding to the control plane or worker pool, the anisble 
 ```
 ansible-playbook -u root -i hosts.ini build-reef.yml --tags form
 ```
+
+
+#### Calicoctl version
+
+The calicoctl version installed is ahead of the calico version used in microk8s, so the --allow-version-mismatch flag is required. You might align those if desired.
