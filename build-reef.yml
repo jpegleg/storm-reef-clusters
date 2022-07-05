@@ -1,5 +1,5 @@
 ---
-- name: install snap to all nodes
+- name: build storm reef cluster
   hosts: reef
   tasks:
   
@@ -8,6 +8,36 @@
       name: snapd
       state: latest
       
+  - name: install auditd
+    apt:
+      name: auditd
+      state: latest
+    tags: packages
+
+  - name: install apparmor
+    apt:
+      name: apparmor
+      state: latest
+    tags: packages
+
+  - name: install vim
+    apt:
+      name: vim
+      state: latest
+    tags: packages
+
+  - name: install tcpdump
+    apt:
+      name: tcpdump
+      state: latest
+    tags: packages
+
+  - name: install rsyslog
+    apt:
+      name: rsyslog
+      state: latest
+    tags: rsyslog
+
   - name: enable and start snapd
     shell: systemctl enable snapd && systemctl start snapd
     args:
@@ -18,14 +48,46 @@
     args:
       executable: /bin/bash
  
-- name: use designated control-node to get token and use calicoctl
-  hosts: control-node
-  tasks:
-
-  - name: install calicoctl
-    shell: curl -L https://github.com/projectcalico/calico/releases/download/v3.23.2/calicoctl-linux-amd64 -o calicoctl && cp calicoctl /usr/local/sbin/calicoctl && chmod +x /usr/local/sbin/calicoctl
+  - name: apply rsyslog.conf
+    copy:
+      src: files/rsyslog.conf
+      dest: /etc/rsyslog.conf
+    tags: rsyslog
+    
+  - name: restart rsyslog
+    shell: systemctl enable rsyslog && systemctl restart rsyslog
     args:
       executable: /bin/bash
+    tags: rsyslog
+
+  - name: add wazuh package key
+    shell: curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -
+    args:
+      executable: /bin/bash
+    tags: wazuh
+
+  - name: add wazuh repo
+    shell: echo "deb https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list && apt-get update
+    args:
+      executable: /bin/bash
+    tags: wazuh
+
+  - name: register wazuh agent
+    shell: WAZUH_MANAGER="192.168.1.126" apt-get install wazuh-agent
+    args:
+      executable: /bin/bash
+    tags: wazuh
+
+  - name: enable wazuh agent
+    shell: systemctl daemon-reload; systemctl enable wazuh-agent; systemctl start wazuh-agent
+    args:
+      executable: /bin/bash
+    tags: wazuh
+
+
+- name: use designated control-node to get tokens
+  hosts: control-node
+  tasks:
 
   - name: register control plane node add command as cadd
     shell:  microk8s add-node | head -n2 | tail -n1
@@ -51,11 +113,6 @@
 - name: add additional control plane nodes
   hosts: added-control-plane
   tasks:
-
-  - name: install calicoctl
-    shell: curl -L https://github.com/projectcalico/calico/releases/download/v3.23.2/calicoctl-linux-amd64 -o calicoctl && cp calicoctl /usr/local/sbin/calicoctl && chmod +x /usr/local/sbin/calicoctl
-    args:
-      executable: /bin/bash
 
   - name: add additional control plane nodes to the cluster
     shell: "{{ hostvars['cnode']['CADD'] }}"
@@ -100,5 +157,3 @@
     tags: 
       - form
       - net
-
-...
